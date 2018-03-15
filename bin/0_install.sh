@@ -105,11 +105,10 @@ echo "#################################"
 echo "# Save details to result file"
 echo "#################################"
 
-create_date= `date '+%Y-%m-%d %H:%M:%S'`
 
 cat > ${result_txt_file}.txt << EOL
 
-CICD Demo Login Details (${create_date})
+CICD Demo Login Details
 
 [Conjur]
 url:      http://conjur.${server_ip}.xip.io:8080"
