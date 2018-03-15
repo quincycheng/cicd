@@ -1,2 +1,2 @@
 data_key
-*.retry
+playbook/*.retry
