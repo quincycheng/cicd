@@ -1,0 +1,86 @@
+version: "2"
+services:
+
+  database:
+    image: postgres:9.3
+    container_name: cicd_database
+
+  conjur:
+    container_name: cicd_conjur
+    image: cyberark/conjur
+    command: server
+    environment:
+      DATABASE_URL: postgres://postgres@database/postgres
+      CONJUR_DATA_KEY:
+    depends_on: [ database ]
+    ports:
+      - "8080:80"
+      - "8443:443"
+
+  client:
+    container_name: cicd_client
+    image: conjurinc/cli5
+    depends_on: [ conjur ]
+    entrypoint: sleep
+    command: infinity
+    environment:
+      CONJUR_APPLIANCE_URL: http://conjur
+      CONJUR_ACCOUNT:
+      CONJUR_AUTHN_API_KEY:
+      CONJUR_AUTHN_LOGIN: admin
+
+  artifactory:
+    container_name: cicd_artifactory
+    image: docker.bintray.io/jfrog/artifactory-oss:5.9.1
+    ports:
+      - "33081:8081"
+      - "33080:80"
+
+  jenkins:
+    container_name: cicd_jenkins
+    image: jenkins/jenkins:lts
+    restart: always
+    environment:
+      - JENKINS_HOME=/var/jenkins_home
+    ports:
+      - "32080:8080"
+      - "32000:50000"
+  sonarqube:
+    container_name: cicd_sonar
+    image: sonarqube:lts
+    ports: "34000:9000"
+
+  gitlab:
+    container_name: cicd_gitlab
+    image: 'gitlab/gitlab-ce:latest'
+    restart: always
+    hostname: gitlab
+    environment:
+      GITLAB_ROOT_PASSWORD: "${GITLAB_ROOT_PASSWORD}"
+      GITLAB_ROOT_EMAIL: "${GITLAB_ROOT_EMAIL}"
+      GITLAB_EXT_URL: "http://gitlab.${SERVER_IP}.xip.io:31080"
+      GITLAB_OMNIBUS_CONFIG: |
+          external_url 'http://gitlab.${SERVER_IP}.xip.io:31080'
+          gitlab_rails['gitlab_shell_ssh_port'] = 2224
+
+    ports:
+      - '31080:31080'
+      - '31022:22'
+  gitlab_runner:
+    container_name: cicd_gitlab_runner
+    image: 'gitlab/gitlab-runner:latest'
+    restart: always
+    hostname: gitlab_runner
+
+  scope:
+    container_name: cicd_scope
+    image: weaveworks/scope:1.7.3
+    network_mode: "host"
+    pid: "host"
+    privileged: true
+    labels:
+      - "works.weave.role=system"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:rw"
+    command:
+      - "--probe.docker=true"

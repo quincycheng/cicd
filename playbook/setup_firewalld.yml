@@ -1,0 +1,10 @@
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+  - firewalld:
+      port: 4040/tcp
+      permanent: true
+      state: enabled
+

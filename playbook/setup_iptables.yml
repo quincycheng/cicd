@@ -1,0 +1,83 @@
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+  - name: accept weavescope port 4040
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 4040
+      protocol: tcp
+      jump: ACCEPT
+
+  - name: accept conjur port 8080
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 8080
+      protocol: tcp
+      jump: ACCEPT
+
+  - name: accept gitlab port 31080
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 31080
+      protocol: tcp
+      jump: ACCEPT
+  - name: accept gitlab port 31443
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 31443
+      protocol: tcp
+      jump: ACCEPT
+  - name: accept gitlab port 31022
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 31022
+      protocol: tcp
+      jump: ACCEPT
+
+  - name: accept jenkins port 32080 
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 32080
+      protocol: tcp
+      jump: ACCEPT
+  - name: accept jenkins port 32000
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 32000
+      protocol: tcp
+      jump: ACCEPT
+
+  - name: accept artifactory port 33081
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 33081
+      protocol: tcp
+      jump: ACCEPT
+  - name: accept artifactory port 33080
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 33080
+      protocol: tcp
+      jump: ACCEPT
+
+
