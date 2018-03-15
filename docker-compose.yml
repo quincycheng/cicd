@@ -42,7 +42,7 @@ services:
     restart: always
     environment:
       - JENKINS_HOME=/var/jenkins_home
-      - jenkins.install.runSetupWizard=false
+      - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
     ports:
       - "32080:8080"
       - "32000:50000"

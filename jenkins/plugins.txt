@@ -1,3 +1,4 @@
+gitlab
 bouncycastle-api
 cloudbees-folder
 structs

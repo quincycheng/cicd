@@ -7,6 +7,8 @@
 
 export server_ip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'|grep -v 172*)
 export gitlab_root_password=$(openssl rand -hex 12)
+export jenkins_admin_password=$(openssl rand -hex 12)
+export jenkins_admin_user=admin
 export conjur_account=demo
 export admin_email=admin@admin.local
 export result_txt_file=demo_login
@@ -70,6 +72,22 @@ conjur_admin_api=$(docker-compose exec conjur conjurctl account create ${conjur_
 
 
 echo "#################################"
+echo "# Setup Jenkins"
+echo "#################################"
+
+
+docker cp ./jenkins/security.groovy  cicd_jenkins:/tmp/security.groovy
+#docker exec cicd_jenkins groovy /tmp/security.groovy ${jenkins_admin_user} ${jenkins_admin_password}
+docker cp ./jenkins/plugins.txt cicd_jenkins:/tmp/plugins.txt
+docker exec cicd_jenkins sh -c '/usr/local/bin/install-plugins.sh < /tmp/plugins.txt'
+
+
+theScript=`cat ./jenkins/security.groovy`
+curl -d "script=${theScript//xPASSx/$jenkins_admin_password}" http://${server_ip}:32080/scriptText
+
+
+
+echo "#################################"
 echo "# Setup Gitlab & CI runner"
 echo "#################################"
 
@@ -99,8 +117,6 @@ docker exec cicd_gitlab_runner gitlab-runner start
 
 
 
-
-
 echo "#################################"
 echo "# Save details to result file"
 echo "#################################"
@@ -116,24 +132,24 @@ url:      https://conjur.${server_ip}.xip.io:8433"
 ${conjur_admin_api}
 
 [Gitlab]
-url:      http://gitlab.${server_ip}.xip.io:31080
-user:     root
-password: ${gitlab_root_password}
+url:  http://gitlab.${server_ip}.xip.io:31080
+user: root
+pass: ${gitlab_root_password}
 
 [Jenkins]
-url:      http://jenkins.${server_ip}.xip.io:32080
+url:  http://jenkins.${server_ip}.xip.io:32080
+user: admin
+pass: ${jenkins_admin_password}
 
 [JFrog Artifactory]
-url:      http://artifactory.${server_ip}.xip.io:33081
+url:  http://artifactory.${server_ip}.xip.io:33081
 
 [SonarQube]
-url:      http://sonar.${server_ip}.xip.io:34000
+url:  http://sonar.${server_ip}.xip.io:34000
 
 
 [WeaveScope]
 url:      http://scope.${server_ip}.xip.io:4040"
-
-
 
 
 EOL
