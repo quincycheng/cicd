@@ -9,7 +9,7 @@ export server_ip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep
 export gitlab_root_password=$(openssl rand -hex 12)
 export conjur_account=demo
 export admin_email=admin@admin.local
-
+export result_txt_file=demo_login
 
 echo "#################################"
 echo "# ansible"
@@ -102,14 +102,37 @@ docker exec cicd_gitlab_runner gitlab-runner start
 
 
 echo "#################################"
-echo "# Done"
+echo "# Save details to result file"
 echo "#################################"
 
-echo "[conjur]"
-echo "url:      http://conjur.${server_ip}.xip.io:8080"
-echo ${conjur_admin_api}
-echo "[Gitlab]"
-echo "url:      http://gitlab.${server_ip}.xip.io:31080"
-echo "user:     root"
-echo "password: ${gitlab_root_password}\n"
+create_date= `date '+%Y-%m-%d %H:%M:%S'`
 
+cat > ${result_txt_file}.txt << EOL
+
+CICD Demo Login Details (${create_date})
+
+[Conjur]
+url:      http://conjur.${server_ip}.xip.io:8080"
+${conjur_admin_api} 
+
+[Gitlab]
+url:      http://gitlab.${server_ip}.xip.io:31080
+user:     root
+password: ${gitlab_root_password}
+
+[Jenkins]
+
+[SonarQube]
+
+[Maven]
+
+[WeaveScope]
+url:      http://scope.${server_ip}.xip.io:4040"
+
+
+
+
+EOL
+
+cat ${result_txt_file}.txt
+echo "The above details can be found in ${result_txt_file}.txt"
