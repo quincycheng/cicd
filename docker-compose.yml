@@ -42,13 +42,16 @@ services:
     restart: always
     environment:
       - JENKINS_HOME=/var/jenkins_home
+      - jenkins.install.runSetupWizard=false
     ports:
       - "32080:8080"
       - "32000:50000"
+
   sonarqube:
     container_name: cicd_sonar
     image: sonarqube:lts
-    ports: "34000:9000"
+    ports: 
+      - "34000:9000"
 
   gitlab:
     container_name: cicd_gitlab

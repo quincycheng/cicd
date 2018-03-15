@@ -113,7 +113,8 @@ CICD Demo Login Details (${create_date})
 
 [Conjur]
 url:      http://conjur.${server_ip}.xip.io:8080"
-${conjur_admin_api} 
+url:      https://conjur.${server_ip}.xip.io:8433"
+${conjur_admin_api}
 
 [Gitlab]
 url:      http://gitlab.${server_ip}.xip.io:31080
@@ -121,10 +122,14 @@ user:     root
 password: ${gitlab_root_password}
 
 [Jenkins]
+url:      http://jenkins.${server_ip}.xip.io:32080
+
+[JFrog Artifactory]
+url:      http://artifactory.${server_ip}.xip.io:33081
 
 [SonarQube]
+url:      http://sonar.${server_ip}.xip.io:34000
 
-[Maven]
 
 [WeaveScope]
 url:      http://scope.${server_ip}.xip.io:4040"
