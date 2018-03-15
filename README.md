@@ -28,12 +28,14 @@ A ruby script is used to get the registration token as there is no offical way t
 
 ### Jenkins
 
-Single container is used to save the host resources
-Setup wizard is skipped and security will be set automatically
+- Single container is used to save the host resources
+- Setup wizard is skipped
+- security will be set automatically
+- an admin account with random password will be created 
 
 ## Useful Scripts
 
-###bin/cleanup.sh
+### bin/cleanup.sh
 This script kills & removes all related containers
 
 
