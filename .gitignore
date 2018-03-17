@@ -1,5 +1,5 @@
 data_key
 playbook/*.retry
 *.txt
-download
-download/*
+downloads
+downloads/*
