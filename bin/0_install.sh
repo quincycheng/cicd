@@ -76,11 +76,29 @@ echo "# Setup Jenkins"
 echo "#################################"
 
 
-docker cp ./jenkins/security.groovy  cicd_jenkins:/tmp/security.groovy
-#docker exec cicd_jenkins groovy /tmp/security.groovy ${jenkins_admin_user} ${jenkins_admin_password}
+if [ ! -d downloads ]; then
+    mkdir downloads
+    curl -o downloads/jdk-8u131-linux-x64.tar.gz http://ftp.osuosl.org/pub/funtoo/distfiles/oracle-java/jdk-8u131-linux-x64.tar.gz
+    curl -o downloads/jdk-7u76-linux-x64.tar.gz http://ftp.osuosl.org/pub/funtoo/distfiles/oracle-java/jdk-7u76-linux-x64.tar.gz
+    curl -o downloads/apache-maven-3.5.0-bin.tar.gz http://apache.mirror.anlx.net/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz
+fi
+
+docker cp ./downloads/jdk-8u131-linux-x64.tar.gz  cicd_jenkins:/tmp/jdk-8u131-linux-x64.tar.gz
+docker cp ./downloads/jdk-7u76-linux-x64.tar.gz cicd_jenkins:/tmp/jdk-7u76-linux-x64.tar.gz
+docker cp ./downloads/apache-maven-3.5.0-bin.tar.gz cicd_jenkins:/tmp/apache-maven-3.5.0-bin.tar.gz
+
+
 docker cp ./jenkins/plugins.txt cicd_jenkins:/tmp/plugins.txt
 docker exec cicd_jenkins sh -c '/usr/local/bin/install-plugins.sh < /tmp/plugins.txt'
 
+theScript=`cat ./jenkins/csrt.groovy`
+curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
+
+theScript=`cat ./jenkins/java.groovy`
+curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
+
+theScript=`cat ./jenkins/maven.groovy`
+curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
 
 theScript=`cat ./jenkins/security.groovy`
 curl -d "script=${theScript//xPASSx/$jenkins_admin_password}" http://${server_ip}:32080/scriptText
@@ -143,15 +161,16 @@ pass: ${jenkins_admin_password}
 
 [JFrog Artifactory]
 url:  http://artifactory.${server_ip}.xip.io:33081
+user: admin
+pass: password
 
 [SonarQube]
 url:  http://sonar.${server_ip}.xip.io:34000
-
+user: admin
+pass: admin
 
 [WeaveScope]
-url:      http://scope.${server_ip}.xip.io:4040"
-
-
+url:  http://scope.${server_ip}.xip.io:4040
 EOL
 
 cat ${result_txt_file}.txt
