@@ -7,8 +7,8 @@ def descriptor = new JDK.DescriptorImpl();
 
 def List<JDK> installations = []
 
-javaTools=[['name':'jdk8', 'url':'file:/tmp/jdk-8u131-linux-x64.tar.gz', 'subdir':'jdk1.8.0_131'],
-      ['name':'jdk7', 'url':'file:/tmp/jdk-7u76-linux-x64.tar.gz', 'subdir':'jdk1.7.0_76']]
+javaTools=[['name':'jdk8', 'url':'file:/tmp/jdk-8u162-linux-x64.tar.gz', 'subdir':'jdk1.8u162'],
+      ['name':'jdk9', 'url':'file:/tmp/jdk-9.0.4_linux-x64_bin.tar.gz', 'subdir':'jdk1.9.0.4']]
 
 javaTools.each { javaTool ->
 

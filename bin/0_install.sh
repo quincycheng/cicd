@@ -78,21 +78,20 @@ echo "#################################"
 
 if [ ! -d downloads ]; then
     mkdir downloads
-    curl -o downloads/jdk-8u131-linux-x64.tar.gz http://ftp.osuosl.org/pub/funtoo/distfiles/oracle-java/jdk-8u131-linux-x64.tar.gz
-    curl -o downloads/jdk-7u76-linux-x64.tar.gz http://ftp.osuosl.org/pub/funtoo/distfiles/oracle-java/jdk-7u76-linux-x64.tar.gz
-    curl -o downloads/apache-maven-3.5.0-bin.tar.gz http://apache.mirror.anlx.net/maven/maven-3/3.5.0/binaries/apache-maven-3.5.0-bin.tar.gz
+
+    curl  -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" -o ./downloads/jdk-9.0.4_linux-x64_bin.tar.gz http://download.oracle.com/otn-pub/java/jdk/9.0.4+11/c2514751926b4512b076cc82f959763f/jdk-9.0.4_linux-x64_bin.tar.gz
+    curl  -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" -o ./downloads/jdk-8u162-linux-x64.tar.gz http://download.oracle.com/otn-pub/java/jdk/8u162-b12/0da788060d494f5095bf8624735fa2f1/jdk-8u162-linux-x64.tar.gz
+
+    curl -o ./downloads/apache-maven-3.5.3-bin.tar.gz http://apache.communilink.net/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
 fi
 
-docker cp ./downloads/jdk-8u131-linux-x64.tar.gz  cicd_jenkins:/tmp/jdk-8u131-linux-x64.tar.gz
-docker cp ./downloads/jdk-7u76-linux-x64.tar.gz cicd_jenkins:/tmp/jdk-7u76-linux-x64.tar.gz
-docker cp ./downloads/apache-maven-3.5.0-bin.tar.gz cicd_jenkins:/tmp/apache-maven-3.5.0-bin.tar.gz
-
+docker cp ./downloads/jdk-9.0.4_linux-x64_bin.tar.gz  cicd_jenkins:/tmp/jdk-9.0.4_linux-x64_bin.tar.gz
+docker cp ./downloads/jdk-8u162-linux-x64.tar.gz cicd_jenkins:/tmp/jdk-8u162-linux-x64.tar.gz
+docker cp ./downloads/apache-maven-3.5.3-bin.tar.gz cicd_jenkins:/tmp/apache-maven-3.5.3-bin.tar.gz
 
 docker cp ./jenkins/plugins.txt cicd_jenkins:/tmp/plugins.txt
-docker exec cicd_jenkins sh -c '/usr/local/bin/install-plugins.sh < /tmp/plugins.txt'
+docker exec cicd_jenkins sh -c 'xargs /usr/local/bin/install-plugins.sh < /tmp/plugins.txt'
 
-theScript=`cat ./jenkins/csrt.groovy`
-curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
 
 theScript=`cat ./jenkins/java.groovy`
 curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
@@ -104,6 +103,7 @@ theScript=`cat ./jenkins/security.groovy`
 curl -d "script=${theScript//xPASSx/$jenkins_admin_password}" http://${server_ip}:32080/scriptText
 
 
+docker restart cicd_jenkins
 
 echo "#################################"
 echo "# Setup Gitlab & CI runner"
@@ -140,6 +140,8 @@ echo "# Save details to result file"
 echo "#################################"
 
 
+rm -f  ${result_txt_file}.txt
+touch ${result_txt_file}.txt
 cat > ${result_txt_file}.txt << EOL
 
 CICD Demo Login Details

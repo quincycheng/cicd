@@ -41,7 +41,6 @@ services:
     image: jenkins/jenkins:lts
     restart: always
     environment:
-      - JENKINS_HOME=/var/jenkins_home
       - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
     ports:
       - "32080:8080"
