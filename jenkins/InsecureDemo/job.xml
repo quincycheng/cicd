@@ -79,7 +79,7 @@
         }
         stage(&apos;Deploy to Artifactory&apos;) {
             steps {
-                sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:ARTIFACTORY_PASS@ARTIFACTORY_URL/artifactory/example-repo-local&quot;
+                sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:ARTIFACTORY_PASS@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
             }
         }
     }

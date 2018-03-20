@@ -5,13 +5,14 @@ echo "#################################"
 echo "# Create Gitlab Insecure Demo"
 echo "#################################"
 
-cp -r ./gitlab/InsecureDemo ./workspace/InsecureDemo
+cp -r ./gitlab/Demo ./workspace/Demo
+cp ./gitlab/InsecureDemo/.gitlab-ci.yml ./workspace/Demo
 
-sed -i "s,JENKINS_USER,${JENKINS_USER},g" ./workspace/InsecureDemo/.gitlab-ci.yml
-sed -i "s,JENKINS_PASS,${JENKINS_PASS},g" ./workspace/InsecureDemo/.gitlab-ci.yml
-sed -i "s,JENKINS_URL,${JENKINS_URL},g" ./workspace/InsecureDemo/.gitlab-ci.yml
+sed -i "s,JENKINS_USER,${JENKINS_USER},g" ./workspace/Demo/.gitlab-ci.yml
+sed -i "s,JENKINS_PASS,${JENKINS_PASS},g" ./workspace/Demo/.gitlab-ci.yml
+sed -i "s,JENKINS_URL,${JENKINS_URL},g" ./workspace/Demo/.gitlab-ci.yml
 
-cd workspace/InsecureDemo
+cd workspace/Demo
 
 rm -rf .git
 git init
@@ -22,7 +23,7 @@ git push --set-upstream http://${GITLAB_USER}:${GITLAB_PASS}@${GITLAB_URL}/root/
 cd ..
 cd ..
 
-rm -rf workspace/InsecureDemo
+rm -rf workspace/Demo
 
 echo "#################################"
 echo "# Create Jenkins Insecure Demo"
