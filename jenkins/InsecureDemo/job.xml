@@ -66,7 +66,7 @@
                             sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
                         },
                         &apos;Quality Check by SonarQube&apos;: {
-                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=admin&quot;
+                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=admin -Dsonar.java.binaries=target/classes&quot;
                         }
                 )
             }
