@@ -1,0 +1,91 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<flow-definition plugin="workflow-job@2.17">
+  <actions>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobAction plugin="pipeline-model-definition@1.2.7"/>
+    <org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction plugin="pipeline-model-definition@1.2.7">
+      <jobProperties/>
+      <triggers/>
+      <parameters/>
+    </org.jenkinsci.plugins.pipeline.modeldefinition.actions.DeclarativeJobPropertyTrackerAction>
+  </actions>
+  <description></description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+      <triggers>
+        <com.dabsquared.gitlabjenkins.GitLabPushTrigger plugin="gitlab-plugin@1.5.3">
+          <spec></spec>
+          <triggerOnPush>true</triggerOnPush>
+          <triggerOnMergeRequest>true</triggerOnMergeRequest>
+          <triggerOnPipelineEvent>false</triggerOnPipelineEvent>
+          <triggerOnAcceptedMergeRequest>false</triggerOnAcceptedMergeRequest>
+          <triggerOnClosedMergeRequest>false</triggerOnClosedMergeRequest>
+          <triggerOnApprovedMergeRequest>true</triggerOnApprovedMergeRequest>
+          <triggerOpenMergeRequestOnPush>never</triggerOpenMergeRequestOnPush>
+          <triggerOnNoteRequest>true</triggerOnNoteRequest>
+          <noteRegex>Jenkins please retry a build</noteRegex>
+          <ciSkip>true</ciSkip>
+          <skipWorkInProgressMergeRequest>true</skipWorkInProgressMergeRequest>
+          <setBuildDescription>true</setBuildDescription>
+          <branchFilterType>All</branchFilterType>
+          <includeBranchesSpec></includeBranchesSpec>
+          <excludeBranchesSpec></excludeBranchesSpec>
+          <targetBranchRegex></targetBranchRegex>
+          <secretToken>{AQAAABAAAAAQdXOw+T37FwTzVheew1G8F6AMzy5Qy3RRDiV2eE6m8Ws=}</secretToken>
+        </com.dabsquared.gitlabjenkins.GitLabPushTrigger>
+      </triggers>
+    </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
+    <com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty plugin="gitlab-plugin@1.5.3">
+      <gitLabConnection></gitLabConnection>
+    </com.dabsquared.gitlabjenkins.connection.GitLabConnectionProperty>
+  </properties>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.45">
+    <script>pipeline {
+    agent any
+
+    tools {
+        jdk &apos;jdk8&apos;
+        maven &apos;maven3&apos;
+    }
+	
+    stages {
+		stage(&apos;Initialize Process&apos;) {
+		    steps {
+			    deleteDir()
+		    }
+		}
+		stage(&apos;Checkout Source&apos;) {
+		    steps {
+			    sh &quot;git clone http://GITLAB_USER:GITLAB_PASS@GITLAB_URL/root/InsecureDemo.git .&quot;
+		    }
+		}
+        stage(&apos;Parallel Tests&apos;) {
+            steps {
+                parallel(
+                        &apos;Unit Test by JUnit and Cobertura&apos;: {
+                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
+                        },
+                        &apos;Quality Check by SonarQube&apos;: {
+                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=admin&quot;
+                        }
+                )
+            }
+            post {
+                always {
+                    junit &apos;**/target/*-reports/TEST-*.xml&apos;
+                    step([$class: &apos;CoberturaPublisher&apos;, coberturaReportFile: &apos;target/site/cobertura/coverage.xml&apos;])
+                }
+            }
+        }
+        stage(&apos;Deploy to Artifactory&apos;) {
+            steps {
+                sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:ARTIFACTORY_PASS@ARTIFACTORY_URL/artifactory/example-repo-local&quot;
+            }
+        }
+    }
+}</script>
+    <sandbox>true</sandbox>
+  </definition>
+  <triggers/>
+  <disabled>false</disabled>
+</flow-definition>

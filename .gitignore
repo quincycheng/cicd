@@ -1,5 +1,6 @@
 data_key
 playbook/*.retry
-*.txt
 downloads
 downloads/*
+workspace
+workspace/*
