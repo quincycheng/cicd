@@ -1,4 +1,0 @@
-trigger_jenkins:
-  script:
-    - 'curl -X POST --user ${GITLAB_USER}:${JENKINS_PASS} --header "JOB-TOKEN: $CI_JOB_TOKEN" 
-"http://jenkins.${SERVER_IP}.xip.io:32080/job/SecureDemo/build"'

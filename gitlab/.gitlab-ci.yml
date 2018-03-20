@@ -1,3 +1,0 @@
-trigger_jenkins:
-  script:
-    - 'curl -X POST --user admin:0286ca21fb2565f6440d39dc --header "JOB-TOKEN: $CI_JOB_TOKEN" "http://jenkins.192.168.191.138.xip.io:32080/job/test/build"'
