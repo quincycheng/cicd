@@ -6,10 +6,8 @@ CICD Demo Login Details
 [General]
 Server IP:  ${SERVER_IP}
 
-[Conjur]
-URL:  http://${CONJUR_URL}
-User: ${CONJUR_USER}
-Pass: ${CONJUR_PASS}
+[Scope]
+URL:  http://${SCOPE_URL}
 
 [Gitlab]
 URL:  http://${GITLAB_URL}
@@ -31,6 +29,13 @@ URL:  http://${ARTIFACTORY_URL}
 User: ${ARTIFACTORY_USER}
 Pass: ${ARTIFACTORY_PASS}
 
-[Scope]
-URL:  http://${SCOPE_URL}
+[AWX]
+URL:  http://${AWX_URL}
+User: ${AWX_USER}
+Pass: ${AWX_PASS}
+
+[Conjur]
+URL:  http://${CONJUR_URL}
+User: ${CONJUR_USER}
+Pass: ${CONJUR_PASS}
 EOF

@@ -8,6 +8,7 @@
 export server_ip=$(ifconfig | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'|grep -v 172*)
 export gitlab_root_password=$(openssl rand -hex 12)
 export jenkins_admin_password=$(openssl rand -hex 12)
+export awx_password=$(openssl rand -hex 12)
 export jenkins_admin_user=admin
 export conjur_account=demo
 export admin_email=admin@admin.local
@@ -105,8 +106,39 @@ curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
 theScript=`cat ./jenkins/security.groovy`
 curl -d "script=${theScript//xPASSx/$jenkins_admin_password}" http://${server_ip}:32080/scriptText
 
-
 docker restart cicd_jenkins
+
+echo "#################################"
+echo "# Download Summon"
+echo "#################################"
+
+curl -L -o downloads/summon.tar.gz https://github.com/cyberark/summon/releases/download/v0.6.6/summon-linux-amd64.tar.gz
+curl -L -o downloads/summon-conjur.tar.gz https://github.com/cyberark/summon-conjur/releases/download/v0.5.0/summon-conjur-linux-amd64.tar.gz
+
+cd downloads/
+tar zvxf summon.tar.gz
+tar zvxf summon-conjur.tar.gz
+cd ..
+
+echo "#################################"
+echo "# Setup AWX"
+echo "#################################"
+
+cd downloads
+
+pip uninstall -y docker
+pip install docker==2.6.1
+
+if [ ! -d awx ]; then
+  git clone https://github.com/ansible/awx.git
+fi
+
+cd ./awx/installer
+sed -i "s,host_port=80,host_port=34080,g" ./inventory
+sed -i "s,# default_admin_password=password,default_admin_password=${awx_password},g" ./inventory
+sed -i "s,# default_admin_user=admin,default_admin_user=admin,g" ./inventory
+ansible-playbook -i inventory install.yml
+cd ../../..
 
 echo "#################################"
 echo "# Setup Gitlab & CI runner"
@@ -148,6 +180,7 @@ CONJUR_DATA_KEY=${CONJUR_DATA_KEY}
 CONJUR_URL=conjur.${server_ip}.xip.io:8080
 CONJUR_USER=admin
 CONJUR_PASS=${conjur_admin_api:(-55)}
+CONJUR_ACCOUNT=${conjur_account}
 GITLAB_URL=gitlab.${server_ip}.xip.io:31080
 GITLAB_USER=root
 GITLAB_PASS=${gitlab_root_password} 
@@ -163,6 +196,9 @@ SONAR_URL=sonar.${server_ip}.xip.io:34000
 SONAR_USER=admin
 SONAR_PASS=admin
 SCOPE_URL=scope.${server_ip}.xip.io:4040
+AWX_URL=awx.${server_ip}.xip.io:34080
+AWX_USER=admin
+AWX_PASS=${awx_password}
 CONJUR_ADMIN_API="${conjur_admin_api}"
 
 EOL
