@@ -9,6 +9,18 @@ install_summon() {
 source ./workspace/config
 
 echo "#################################"
+echo "# Load Conjur Policies"
+echo "#################################"
+
+docker exec cicd_client sh -c "mkdir -p /tmp/policy"
+docker cp ./policy cicd_client:/tmp
+docker cp ./workspace/config cicd_client:/tmp/policy/
+
+docker exec cicd_client sh -c "/tmp/policy/loadpolicy.sh"
+
+exit 1
+
+echo "#################################"
 echo "# Install Summon to containers"
 echo "#################################"
 

@@ -1,0 +1,29 @@
+- !grant
+  role: !group jenkins/secrets-users
+  member: !layer /gitlab
+
+- !grant
+  role: !group gitlab/secrets-users
+  member: !layer /jenkins
+
+- !grant
+  role: !group sonar/secrets-users
+  member: !layer /jenkins
+
+
+- !grant
+  role: !group artifactory/secrets-users
+  member: !layer /jenkins
+
+- !grant
+  role: !group awx/secrets-users
+  member: !layer /jenkins
+
+- !grant
+  role: !group artifactory/secrets-users
+  member: !layer /awx
+
+- !grant
+  role: !group docker/secrets-users
+  member: !layer /awx
+

@@ -1,0 +1,31 @@
+- hosts: localhost
+  connection: local
+
+  tasks:
+
+  - user:
+      name: cicd_service_account
+      shell: /bin/bash
+      groups: docker
+      append: yes
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_file: .ssh/id_rsa
+
+
+
+  - name: Set authorized key took from file
+    authorized_key:
+      user: cicd_service_account
+      state: present
+      key: "{{ lookup('file', '~cicd_service_account/.ssh/id_rsa.pub') }}"
+
+  - name: Copy public key to AWX Task
+    command: docker cp ~cicd_service_account/.ssh/id_rsa.pub awx_task:/tmp/id_rsa.pub
+
+  - name: Create projects directory at AWX web
+    command: docker exec awx_web sh -c "mkdir -p /var/lib/awx/projects"
+
+  - name: Create projects directory at AWX task
+    command: docker exec awx_task sh -c "mkdir -p /var/lib/awx/projects"
+

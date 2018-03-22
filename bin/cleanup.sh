@@ -18,3 +18,14 @@ docker rm cicd_artifactory
 docker rm cicd_sonar
 docker rm cicd_scope
 
+docker stop awx_task
+docker stop awx_web
+docker stop memcached
+docker stop rabbitmq
+docker stop postgres
+
+docker rm awx_task
+docker rm awx_web
+docker rm memcached
+docker rm rabbitmq
+docker rm postgres

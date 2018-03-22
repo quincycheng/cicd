@@ -73,7 +73,7 @@ echo "# Setup Conjur Account"
 echo "#################################"
 
 conjur_admin_api=$(docker-compose exec conjur conjurctl account create ${conjur_account})
-
+conjur_admin_api=${conjur_admin_api//[[:blank:]]/}
 
 echo "#################################"
 echo "# Setup Jenkins"
@@ -199,7 +199,7 @@ SCOPE_URL=scope.${server_ip}.xip.io:4040
 AWX_URL=awx.${server_ip}.xip.io:34080
 AWX_USER=admin
 AWX_PASS=${awx_password}
-CONJUR_ADMIN_API="${conjur_admin_api}"
+CONJUR_API="${conjur_admin_api}"
 
 EOL
 

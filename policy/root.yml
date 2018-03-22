@@ -1,0 +1,22 @@
+- !policy
+  id: gitlab
+
+- !policy
+  id: jenkins
+
+- !policy
+  id: sonar
+
+- !policy
+  id: artifactory
+
+- !policy
+  id: awx
+
+- !policy
+  id: docker
+
+- !policy
+  id: entitlement
+
+
