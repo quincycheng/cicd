@@ -1,31 +1,49 @@
 #!/bin/bash
+source ./workspace/config
 
 install_summon() {
-  docker cp ./downloads/summon $1:/usr/local/bin
-  docker exec $1 mkdir -p /usr/local/lib/summon
-  docker cp ./downloads/summon $1:/usr/local/lib/summon
+  docker cp ./downloads/summon $2:/usr/local/bin
+  docker exec $2 mkdir -p /usr/local/lib/summon
+  docker cp ./downloads/summon $2:/usr/local/lib/summon
+  docker cp ./policy/enroll.sh  $2:/tmp/enroll.sh
+
+  docker cp ./downloads/jq $2:/usr/local/bin
+
+  echo "[$2]"
+  int_ip="$(docker inspect $2 | jq -r '.[0].NetworkSettings.Networks.cicd_default.IPAddress')"
+  echo "ip: $int_ip"
+  hf_token="$(docker exec cicd_client conjur hostfactory tokens create --duration-minutes 1 --cidr $int_ip/32 $3 | jq -r '.[0].token')"
+  echo "hf: $hf_token"
+  docker exec -u 0 $2 sh -c "/tmp/enroll.sh $1 $2 $hf_token"
 }
 
-source ./workspace/config
 
 echo "#################################"
 echo "# Load Conjur Policies"
 echo "#################################"
 
+
+chmod +x downloads/jq 
+
 docker exec cicd_client sh -c "mkdir -p /tmp/policy"
 docker cp ./policy cicd_client:/tmp
+echo "here1"
 docker cp ./workspace/config cicd_client:/tmp/policy/
+echo "here"
+
+docker cp ${DOCKER_SSH_KEY} "/tmp/policy/ida_rsa"
 
 docker exec cicd_client sh -c "/tmp/policy/loadpolicy.sh"
 
-exit 1
 
 echo "#################################"
-echo "# Install Summon to containers"
+echo "# Summon & Enroll to Conjur"
 echo "#################################"
 
-install_summon cicd_gitlab_runner
-install_summon cicd_jenkins
+install_summon ${CONJUR_ACCOUNT} cicd_gitlab_runner gitlab
+install_summon ${CONJUR_ACCOUNT} cicd_jenkins jenkins
+install_summon ${CONJUR_ACCOUNT} awx_task awx
+
 
 exit 1
 

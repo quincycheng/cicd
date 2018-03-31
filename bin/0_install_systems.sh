@@ -42,6 +42,7 @@ echo "# Pull Images"
 echo "#################################"
 
 docker-compose pull
+docker pull openjdk:8-jre-alpine
 
 echo "#################################"
 echo "# Generate Conjur Data Key"
@@ -73,7 +74,8 @@ echo "# Setup Conjur Account"
 echo "#################################"
 
 conjur_admin_api=$(docker-compose exec conjur conjurctl account create ${conjur_account})
-conjur_admin_api=${conjur_admin_api//[[:blank:]]/}
+conjur_pass=${conjur_admin_api:(-55)}
+conjur_pass=${conjur_pass//[[:blank:]]/}
 
 echo "#################################"
 echo "# Setup Jenkins"
@@ -87,6 +89,9 @@ if [ ! -d downloads ]; then
     curl  -j -k -L -H "Cookie: oraclelicense=accept-securebackup-cookie" -o ./downloads/jdk-8u162-linux-x64.tar.gz http://download.oracle.com/otn-pub/java/jdk/8u162-b12/0da788060d494f5095bf8624735fa2f1/jdk-8u162-linux-x64.tar.gz
 
     curl -o ./downloads/apache-maven-3.5.3-bin.tar.gz http://apache.communilink.net/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
+
+    curl -L -o downloads/jq https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 chmod +x downloads/jq
+
 fi
 
 docker cp ./downloads/jdk-9.0.4_linux-x64_bin.tar.gz  cicd_jenkins:/tmp/jdk-9.0.4_linux-x64_bin.tar.gz
@@ -94,8 +99,7 @@ docker cp ./downloads/jdk-8u162-linux-x64.tar.gz cicd_jenkins:/tmp/jdk-8u162-lin
 docker cp ./downloads/apache-maven-3.5.3-bin.tar.gz cicd_jenkins:/tmp/apache-maven-3.5.3-bin.tar.gz
 
 docker cp ./jenkins/plugins.txt cicd_jenkins:/tmp/plugins.txt
-docker exec cicd_jenkins sh -c 'xargs /usr/local/bin/install-plugins.sh < /tmp/plugins.txt'
-
+docker exec cicd_jenkins sh -c 'xargs /usr/local/bin/install-plugins.sh < /tmp/plugins.txt' || true
 
 theScript=`cat ./jenkins/java.groovy`
 curl -d "script=${theScript}" http://${server_ip}:32080/scriptText
@@ -135,10 +139,23 @@ fi
 
 cd ./awx/installer
 sed -i "s,host_port=80,host_port=34080,g" ./inventory
-sed -i "s,# default_admin_password=password,default_admin_password=${awx_password},g" ./inventory
+sed -i "s,.*default_admin_password=.*,default_admin_password=${awx_password},g" ./inventory
 sed -i "s,# default_admin_user=admin,default_admin_user=admin,g" ./inventory
 ansible-playbook -i inventory install.yml
 cd ../../..
+
+
+docker network connect cicd_default rabbitmq
+docker network connect cicd_default postgres
+docker network connect cicd_default memcached
+docker network connect cicd_default awx_web
+docker network connect cicd_default awx_task
+
+echo "#################################"
+echo "# Create Docker Service Account"
+echo "#################################"
+ansible-playbook playbook/create_docker_user.yml
+DOCKER_SSH_KEY="/home/cicd_service_account/.ssh/id_rsa"
 
 echo "#################################"
 echo "# Setup Gitlab & CI runner"
@@ -179,7 +196,7 @@ SERVER_IP=${server_ip}
 CONJUR_DATA_KEY=${CONJUR_DATA_KEY}
 CONJUR_URL=conjur.${server_ip}.xip.io:8080
 CONJUR_USER=admin
-CONJUR_PASS=${conjur_admin_api:(-55)}
+CONJUR_PASS=${conjur_pass}
 CONJUR_ACCOUNT=${conjur_account}
 GITLAB_URL=gitlab.${server_ip}.xip.io:31080
 GITLAB_USER=root
@@ -199,9 +216,12 @@ SCOPE_URL=scope.${server_ip}.xip.io:4040
 AWX_URL=awx.${server_ip}.xip.io:34080
 AWX_USER=admin
 AWX_PASS=${awx_password}
-CONJUR_API="${conjur_admin_api}"
+DOCKER_SSH_USER=cicd_service_account
+DOCKER_SSH_KEY="${DOCKER_SSH_KEY}"
 
 EOL
+
+#CONJUR_API="${conjur_admin_api}"
 
 rm -f data_key
 

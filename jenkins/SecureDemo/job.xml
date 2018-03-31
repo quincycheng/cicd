@@ -56,7 +56,7 @@
 		}
 		stage(&apos;Checkout Source&apos;) {
 		    steps {
-			    sh &quot;git clone http://GITLAB_USER:GITLAB_PASS@GITLAB_URL/root/InsecureDemo.git .&quot;
+			    sh &quot;summon git clone http://GITLAB_USER:${SECURE_GITLAB_PASS}@GITLAB_URL/root/InsecureDemo.git .&quot;
 		    }
 		}
         stage(&apos;Parallel Tests&apos;) {

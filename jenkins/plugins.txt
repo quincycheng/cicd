@@ -44,7 +44,6 @@ handlebars
 antisamy-markup-formatter
 scm-api
 workflow-scm-step
-gradle
 pipeline-stage-step
 workflow-job
 pipeline-model-declarative-agent
@@ -84,7 +83,6 @@ blueocean-pipeline-scm-api
 htmlpublisher
 variant
 blueocean-web
-blueocean-jwt
 favorite
 blueocean-rest-impl
 blueocean-pipeline-api-impl

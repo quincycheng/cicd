@@ -1,4 +1,5 @@
 version: "2"
+
 services:
 
   database:
@@ -38,7 +39,8 @@ services:
 
   jenkins:
     container_name: cicd_jenkins
-    image: jenkins/jenkins:lts
+#    image: jenkins/jenkins:lts
+    image: jenkinsci/blueocean
     restart: always
     environment:
       - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"

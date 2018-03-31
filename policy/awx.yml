@@ -1,12 +1,13 @@
 - !policy
   id: awx
   body:
-  - !variable password
+  - &awx_variables
+    - !variable password
 
   - !group secrets-users
 
   - !permit
-    resource: *variables
+    resource: *awx_variables
     privileges: [ read, execute ]
     roles: !group secrets-users
 

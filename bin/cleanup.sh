@@ -29,3 +29,6 @@ docker rm awx_web
 docker rm memcached
 docker rm rabbitmq
 docker rm postgres
+
+
+rm -rf /tmp/pgdocker/

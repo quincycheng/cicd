@@ -1,12 +1,13 @@
 - !policy
   id: docker
   body:
-  - !variable password
+  - &docker_variables
+    - !variable ssh_private_key
 
   - !group secrets-users
 
   - !permit
-    resource: *variables
+    resource: *docker_variables
     privileges: [ read, execute ]
     roles: !group secrets-users
 

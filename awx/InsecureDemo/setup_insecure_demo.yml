@@ -23,4 +23,12 @@
   - name: Copy public key to AWX Task
     command: docker cp ~cicd_service_account/.ssh/id_rsa.pub awx_task:/tmp/id_rsa.pub
 
+  - name: Copy private key to AWX Task
+    command: docker cp ~cicd_service_account/.ssh/id_rsa awx_task:/tmp/id_rsa
+
+  - name: Create projects directory at AWX web
+    command: docker exec awx_web sh -c "mkdir -p /var/lib/awx/projects"
+
+  - name: Create projects directory at AWX task
+    command: docker exec awx_task sh -c "mkdir -p /var/lib/awx/projects"
 
