@@ -1,8 +1,0 @@
----
-
-- hosts: docker
-  remote_user: cicd_service_account
-  tasks:
-    - name: Echo a hello message
-      command: echo hello
-
