@@ -1,12 +1,13 @@
 - !policy
   id: gitlab
   body:
-  - !variable password
+  - &gitlab_variables
+    - !variable password
 
   - !group secrets-users
 
   - !permit
-    resource: *variables
+    resource: *gitlab_variables
     privileges: [ read, execute ]
     roles: !group secrets-users
 

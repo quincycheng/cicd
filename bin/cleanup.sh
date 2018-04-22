@@ -31,4 +31,10 @@ docker rm rabbitmq
 docker rm postgres
 
 
+docker stop cicd_InsecureDemo
+docker rm cicd_InsecureDemo
+docker stop cicd_SecureDemo
+docker rm cicd_SecureDemo
+
+
 rm -rf /tmp/pgdocker/

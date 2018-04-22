@@ -1,12 +1,13 @@
 - !policy
   id: artifactory
   body:
-  - !variable password
+  - &artifactory_variables
+    - !variable password
 
   - !group secrets-users
 
   - !permit
-    resource: *variables
+    resource: *artifactory_variables
     privileges: [ read, execute ]
     roles: !group secrets-users
 

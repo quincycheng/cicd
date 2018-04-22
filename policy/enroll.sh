@@ -20,16 +20,15 @@ function fetch_machine_identity() {
 
   if [ $status -eq 201 ]; then
     cat > /etc/conjur.identity <<EOF
-    machine $baseurl/api/authn
-    login host/$hostid
-    password $(jq -r '.api_key' /tmp/host.json)
+machine $baseurl/authn
+login host/$hostid
+password $(jq -r '.api_key' /tmp/host.json)
 EOF
 
     cat > /etc/conjur.conf << EOF
----
 account: $conjur_account
 plugins: []
-appliance_url: conjur
+appliance_url: http://conjur
 netrc_path: /etc/conjur.identity
 EOF
 

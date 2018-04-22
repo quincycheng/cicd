@@ -74,8 +74,7 @@ echo "# Setup Conjur Account"
 echo "#################################"
 
 conjur_admin_api=$(docker-compose exec conjur conjurctl account create ${conjur_account})
-conjur_pass=${conjur_admin_api:(-55)}
-conjur_pass=${conjur_pass//[[:blank:]]/}
+conjur_pass=$(echo ${conjur_admin_api}|sed 's/.* //')
 
 echo "#################################"
 echo "# Setup Jenkins"
@@ -185,8 +184,6 @@ docker exec cicd_gitlab_runner gitlab-runner register --non-interactive \
 docker exec cicd_gitlab_runner gitlab-runner start
 
 
-
-
 echo "#################################"
 echo "# Save details to result file"
 echo "#################################"
@@ -221,7 +218,9 @@ DOCKER_SSH_KEY="${DOCKER_SSH_KEY}"
 
 EOL
 
-#CONJUR_API="${conjur_admin_api}"
+cat > ./workspace/conjur_config << EOL
+CONJUR_API="${conjur_admin_api}"
+EOL
 
 rm -f data_key
 

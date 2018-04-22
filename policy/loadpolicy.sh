@@ -1,7 +1,6 @@
 #!/bin/bash 
 source /tmp/policy/config
 
-conjur init -u conjur -a ${CONJUR_ACCOUNT} --force=~/.conjurrc
 
 cat > ~/.netrc << EOF
 machine http://conjur/authn
@@ -9,6 +8,8 @@ machine http://conjur/authn
   password ${CONJUR_PASS}
 
 EOF
+
+conjur init -u conjur -a ${CONJUR_ACCOUNT} --force=~/.conjurrc
 
 chmod 0600 ~/.netrc
 
@@ -31,4 +32,3 @@ conjur variable values add docker/ssh_private_key  /tmp/policy/ida_rsa
 
 cat /tmp/policy/entitlement.yml >> /tmp/policy/conjur.yml
 conjur policy load root /tmp/policy/conjur.yml
-

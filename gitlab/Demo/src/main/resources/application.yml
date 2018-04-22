@@ -28,6 +28,7 @@ project:
   name: spring-boot-rest-example
   version: 0.1
   description: boot-example default description
+  artifactId: boot-example
 info:
   build:
     artifact: ${project.artifactId}

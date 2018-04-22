@@ -1,12 +1,13 @@
 - !policy
   id: jenkins
   body:
-  - !variable password
+  - &jenkins_variables
+    - !variable password
 
   - !group secrets-users
 
   - !permit
-    resource: *variables
+    resource: *jenkins_variables
     privileges: [ read, execute ]
     roles: !group secrets-users
 

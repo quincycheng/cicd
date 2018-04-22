@@ -1,6 +1,13 @@
 #!/bin/bash
 source ./workspace/config
 
+until ["$(curl -s -k -L $AWX_URL |grep login)"]; 
+do 
+    echo "." 
+    sleep 10
+done
+
+
 
 # Copy Files
 docker exec awx_task mkdir -p /var/lib/awx/projects/InsecureDemo
@@ -9,17 +16,20 @@ docker exec awx_web mkdir -p /var/lib/awx/projects/InsecureDemo
 docker cp awx/InsecureDemo/ awx_task:/var/lib/awx/projects/
 docker cp awx/InsecureDemo/ awx_web:/var/lib/awx/projects/
 
-# Create Project
-AWX_PROJECT_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/projects/ \
-   -d '{ "name": "Insecure Demo", "description": "Insecure Demo", "local_path": "InsecureDemo"}'| jq -r '.id')
-
-echo "project id: ${AWX_PROJECT_ID}"
-
 # Create Org
 AWX_ORG_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/organizations/ \
    -d '{ "name": "Insecure Demo", "description": "Insecure Demo"}' | jq -r '.id')
 
 echo "org id: ${AWX_ORG_ID}"
+
+
+# Create Project
+AWX_PROJECT_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/projects/ \
+   -d "{ \"name\": \"Insecure Demo\", \"description\": \"Insecure Demo\", \"local_path\": \"InsecureDemo\", \
+   \"organization\": ${AWX_ORG_ID} }"| jq -r '.id')
+
+echo "project id: ${AWX_PROJECT_ID}"
+
 
 # Create Inventory
 
@@ -40,9 +50,9 @@ echo "host id: ${AWX_HOST_ID}"
 # Create Job Template
 AWX_TEMPLATE_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/job_templates/ \
    -d "{ \"name\": \"Insecure Demo\", \"description\": \"Insecure Demo\", \"inventory\": $AWX_INVENTORY_ID, \
-         \"project\": $AWX_PROJECT_ID, \"playbook\": \"deploy.yml\", \"extra_vars\": \"\" }" | jq -r '.id')
+         \"project\": $AWX_PROJECT_ID, \"playbook\": \"deploy.yml\", \"ask_variables_on_launch\": true }" | jq -r '.id')
 
-echo "template id: ${AWX_TEMPLATE_ID}"
+echo "template id: ${AWX_TEMPLATE_ID} "
 
 
 # Copy Keys

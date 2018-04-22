@@ -20,7 +20,7 @@
 
     - name: Download artifact
       get_url:
-        url: http://artifactory.192.168.191.138.xip.io:33081/artifactory/example-repo-local/com/khoubyari/spring-boot-rest-example/0.1.2/spring-boot-rest-example-0.1.2.war
+        url: "{{artifact_url}}"
         dest: "{{ppath.stdout}}/app.war"
 
 

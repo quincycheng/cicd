@@ -44,29 +44,30 @@
     agent any
 
     tools {
-        jdk &apos;jdk8&apos;
         maven &apos;maven3&apos;
     }
-	
+    environment {
+	JAVA_HOME = "/usr/lib/jvm/java-1.8-openjdk"
+    }	
     stages {
-		stage(&apos;Initialize Process&apos;) {
-		    steps {
-			    deleteDir()
-		    }
-		}
-		stage(&apos;Checkout Source&apos;) {
-		    steps {
-			    sh &quot;git clone http://GITLAB_USER:GITLAB_PASS@GITLAB_URL/root/InsecureDemo.git .&quot;
-		    }
-		}
+	stage(&apos;Initialize Process&apos;) {
+	    steps {
+		    deleteDir()
+	    }
+	}
+	stage(&apos;Checkout Source&apos;) {
+	    steps {
+		    sh &quot;git clone http://GITLAB_USER:GITLAB_PASS@GITLAB_URL/root/InsecureDemo.git .&quot;
+	    }
+	}
         stage(&apos;Parallel Tests&apos;) {
             steps {
                 parallel(
                         &apos;Unit Test by JUnit and Cobertura&apos;: {
-                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
+                            sh &quot; mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot; 
                         },
                         &apos;Quality Check by SonarQube&apos;: {
-                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=admin -Dsonar.java.binaries=target/classes&quot;
+                            sh &quot;mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=admin -Dsonar.java.binaries=target/classes&quot; 
                         }
                 )
             }
@@ -79,7 +80,21 @@
         }
         stage(&apos;Deploy to Artifactory&apos;) {
             steps {
-                sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:ARTIFACTORY_PASS@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
+                sh &quot;mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:ARTIFACTORY_PASS@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
+            }
+        }
+        stage(&apos;Trigger CD process using Ansible&apos;) {
+            steps {
+                sh '''
+                    curl -k \\
+                        -X POST \\
+                        -u AWX_USER:AWX_PASS \\
+                        -H \'Accept: application/json\' \\
+                        -H \'Content-Type: application/json\' \\
+                        http://AWX_CONTAINER_IP:8052/api/v2/job_templates/AWX_TEMPLATE_ID/launch/ -d \\
+                        \'{"extra_vars": { "artifact_url":"http://cicd_artifactory/artifactory/example-repo-local/com/khoubyari/spring-boot-rest-example/0.1.${BUILD_NUMBER}/spring-boot-rest-example-0.1.${BUILD_NUMBER}.war"} }\'     
+                '''
+
             }
         }
     }

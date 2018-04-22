@@ -44,6 +44,8 @@ services:
     restart: always
     environment:
       - JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
+      - CONJUR_NETRC_PATH="/etc/conjur.identity"
+
     ports:
       - "32080:8080"
       - "32000:50000"
@@ -75,10 +77,13 @@ services:
     image: 'gitlab/gitlab-runner:latest'
     restart: always
     hostname: gitlab_runner
+    environment:
+      CONJUR_NETRC_PATH: "/etc/conjur.identity"
+
 
   scope:
     container_name: cicd_scope
-    image: weaveworks/scope:1.7.3
+    image: weaveworks/scope:latest
     network_mode: "host"
     pid: "host"
     privileged: true
