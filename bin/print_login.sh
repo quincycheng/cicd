@@ -41,8 +41,9 @@ Pass: ${CONJUR_PASS}
 
 [Demo]
 Insecure:  http://${SERVER_IP}:8091/info
-	   http://${SERVER_IP}:9091/health
-Secure:    http://${SERVER_IP}:8099
+	   http://${SERVER_IP}:8091/health
+Secure:    http://${SERVER_IP}:8099/info
+	   http://${SERVER_IP}:8099/health
 
 
 EOF

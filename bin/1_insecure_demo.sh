@@ -68,6 +68,7 @@ echo "#################################"
 cp -r ./gitlab/Demo ./workspace/Demo
 cp ./gitlab/InsecureDemo/.gitlab-ci.yml ./workspace/Demo
 cp ./gitlab/InsecureDemo/callJenkins.sh ./workspace/Demo
+cp ./gitlab/InsecureDemo/pom.xml ./workspace/Demo
 
 sed -i "s,JENKINS_URL,${JENKINS_URL},g" ./workspace/Demo/callJenkins.sh
 sed -i "s,JENKINS_USER,${JENKINS_USER},g" ./workspace/Demo/callJenkins.sh

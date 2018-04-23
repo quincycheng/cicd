@@ -101,7 +101,7 @@
                         -H "Accept: application/json" \\
                         -H "Content-Type: application/json" \\
                         http://AWX_CONTAINER_IP:8052/api/v2/job_templates/AWX_TEMPLATE_ID/launch/ -d \\
-                        '{"extra_vars": { "artifact_url":"http://cicd_artifactory/artifactory/example-repo-local/com/khoubyari/spring-boot-rest-example/0.1.${BUILD_NUMBER}/spring-boot-rest-example-0.1.${BUILD_NUMBER}.war"} }'  \\
+                        '{"extra_vars": { "artifact_url":"http://cicd_artifactory/artifactory/example-repo-local/com/khoubyari/secure-spring-boot-rest-example/0.1.${BUILD_NUMBER}/secure-spring-boot-rest-example-0.1.${BUILD_NUMBER}.war"} }'  \\
                     '   
                 '''
 
