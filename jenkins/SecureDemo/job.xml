@@ -44,7 +44,6 @@
     agent any
 
     tools {
-        jdk &apos;jdk8&apos;
         maven &apos;maven3&apos;
     }
     environment {
@@ -59,7 +58,9 @@
 		}
 		stage(&apos;Checkout Source&apos;) {
 		    steps {
-			    sh &quot;summon --yaml 'SECURE_GITLAB_PASS: !var gitlab/password' git clone http://GITLAB_USER:${SECURE_GITLAB_PASS}@GITLAB_URL/root/InsecureDemo.git .&quot;
+			sh """
+			summon --yaml \'SECURE_GITLAB_PASS: !var gitlab/password\' sh -c \'git clone http://root:\$SECURE_GITLAB_PASS@gitlab.192.168.191.138.xip.io:31080/root/SecureDemo.git .\'
+			"""
 		    }
 		}
         stage(&apos;Parallel Tests&apos;) {
@@ -69,7 +70,9 @@
                             sh &quot;mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
                         },
                         &apos;Quality Check by SonarQube&apos;: {
-                            sh &quot;summon --yaml 'SECURE_SONAR_PASS: !var sonar/password' mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=${SECURE_SONAR_PASS} -Dsonar.java.binaries=target/classes&quot;
+                            sh """
+				summon --yaml \'SECURE_SONAR_PASS: !var sonar/password\' sh -c \'mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=\${SECURE_SONAR_PASS} -Dsonar.java.binaries=target/classes\'
+			    """
                         }
                 )
             }
@@ -82,9 +85,33 @@
         }
         stage(&apos;Deploy to Artifactory&apos;) {
             steps {
-                sh &quot;summon --yaml 'SECURE_ARTIFACTORY_PASS: !var artifactory/password' mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:${SECURE_ARTIFACTORY_PASS}@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
+		sh """
+                summon --yaml \'SECURE_ARTIFACTORY_PASS: !var artifactory/password\' sh -c \'mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:\${SECURE_ARTIFACTORY_PASS}@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=\${BUILD_NUMBER}\'
+		"""
             }
         }
+
+
+        stage(&apos;Trigger CD process using Ansible&apos;) {
+            steps {
+                sh '''
+                  summon --yaml "SECURE_AWX_PASS: !var awx/password" sh -c ' \\
+                    curl -k -X POST \\
+                        -u AWX_USER:\$SECURE_AWX_PASS \\
+                        -H "Accept: application/json" \\
+                        -H "Content-Type: application/json" \\
+                        http://AWX_CONTAINER_IP:8052/api/v2/job_templates/AWX_TEMPLATE_ID/launch/ -d \\
+                        '{"extra_vars": { "artifact_url":"http://cicd_artifactory/artifactory/example-repo-local/com/khoubyari/spring-boot-rest-example/0.1.${BUILD_NUMBER}/spring-boot-rest-example-0.1.${BUILD_NUMBER}.war"} }'  \\
+                    '   
+                '''
+
+            }
+        }
+
+
+
+
+
     }
 }</script>
     <sandbox>true</sandbox>

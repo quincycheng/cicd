@@ -3,22 +3,12 @@ source ./workspace/config
 
 install_summon() {
 
-docker cp ./downloads/summon $2:/usr/local/bin
-docker exec -u 0 $2 mkdir -p /usr/local/lib/summon
-docker cp ./downloads/summon-conjur $2:/usr/local/lib/summon
+  docker cp ./downloads/summon $2:/usr/local/bin
+  docker exec -u 0 $2 mkdir -p /usr/local/lib/summon
+  docker cp ./downloads/summon-conjur $2:/usr/local/lib/summon
 
-#docker exec -u 0 $2 sh -c "curl -sSL https://raw.githubusercontent.com/cyberark/summon/master/install.sh | bash"
-#docker exec -u 0 $2 sh -c "curl -sSL https://raw.githubusercontent.com/cyberark/summon-conjur/master/install.sh | bash"
-
-#docker cp ./policy/installSummon.sh  $2:/tmp/installSummon.sh
-#docker exec -u 0 $2 sh -c "/tmp/installSummon.sh"
-
-#  docker exec -u 0 $2 sh -c "echo 'CONJURRC=/etc/conjur.conf' >> /etc/environment"
-#  docker exec -u 0 $2 sh -c "echo 'export CONJURRC=/etc/conjur.conf' >> /etc/profile.d/conjur.sh"
-#  docker exec -u 0 $2 sh -c "chmod +x /etc/profile.d/conjur.sh"
-
-docker cp ./policy/enroll.sh  $2:/tmp/enroll.sh
-docker cp ./downloads/jq $2:/usr/local/bin
+  docker cp ./policy/enroll.sh  $2:/tmp/enroll.sh
+  docker cp ./downloads/jq $2:/usr/local/bin
 
   echo "[$2]"
   int_ip="$(docker inspect $2 | jq -r '.[0].NetworkSettings.Networks.cicd_default.IPAddress')"
@@ -52,8 +42,6 @@ echo "#################################"
 install_summon ${CONJUR_ACCOUNT} cicd_gitlab_runner gitlab
 install_summon ${CONJUR_ACCOUNT} cicd_jenkins jenkins
 install_summon ${CONJUR_ACCOUNT} awx_task awx
-
-
 
 echo "#################################"
 echo "# Create AWX Secure Demo"
