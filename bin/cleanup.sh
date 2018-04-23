@@ -36,5 +36,8 @@ docker rm cicd_InsecureDemo
 docker stop cicd_SecureDemo
 docker rm cicd_SecureDemo
 
+docker rmi cicd/insecuredemo
+docker rmi cicd/securedemo
+
 
 rm -rf /tmp/pgdocker/
