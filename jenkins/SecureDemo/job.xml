@@ -47,6 +47,9 @@
         jdk &apos;jdk8&apos;
         maven &apos;maven3&apos;
     }
+    environment {
+        JAVA_HOME = "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+    }
 	
     stages {
 		stage(&apos;Initialize Process&apos;) {
@@ -56,17 +59,17 @@
 		}
 		stage(&apos;Checkout Source&apos;) {
 		    steps {
-			    sh &quot;summon git clone http://GITLAB_USER:${SECURE_GITLAB_PASS}@GITLAB_URL/root/InsecureDemo.git .&quot;
+			    sh &quot;summon --yaml 'SECURE_GITLAB_PASS: !var gitlab/password' git clone http://GITLAB_USER:${SECURE_GITLAB_PASS}@GITLAB_URL/root/InsecureDemo.git .&quot;
 		    }
 		}
         stage(&apos;Parallel Tests&apos;) {
             steps {
                 parallel(
                         &apos;Unit Test by JUnit and Cobertura&apos;: {
-                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
+                            sh &quot;mvn -U clean test cobertura:cobertura -Dcobertura.report.format=xml&quot;
                         },
                         &apos;Quality Check by SonarQube&apos;: {
-                            sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; summon mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=${SECURE_SONAR_PASS} -Dsonar.java.binaries=target/classes&quot;
+                            sh &quot;summon --yaml 'SECURE_SONAR_PASS: !var sonar/password' mvn sonar:sonar -Dsonar.host.url=http://cicd_sonar:9000 -Dsonar.username=admin -Dsonar.password=${SECURE_SONAR_PASS} -Dsonar.java.binaries=target/classes&quot;
                         }
                 )
             }
@@ -79,7 +82,7 @@
         }
         stage(&apos;Deploy to Artifactory&apos;) {
             steps {
-                sh &quot;JAVA_HOME=/var/jenkins_home/tools/hudson.model.JDK/jdk8/jdk1.8.0_162 &amp;&amp; summon mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:${SECURE_ARTIFACTORY_PASS}@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
+                sh &quot;summon --yaml 'SECURE_ARTIFACTORY_PASS: !var artifactory/password' mvn deploy -DskipTests -Dartifactory_url=http://ARTIFACTORY_USER:${SECURE_ARTIFACTORY_PASS}@ARTIFACTORY_URL/artifactory/example-repo-local -Dv=${BUILD_NUMBER}&quot;
             }
         }
     }

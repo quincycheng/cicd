@@ -67,10 +67,11 @@ echo "#################################"
 
 cp -r ./gitlab/Demo ./workspace/Demo
 cp ./gitlab/InsecureDemo/.gitlab-ci.yml ./workspace/Demo
+cp ./gitlab/InsecureDemo/callJenkins.sh ./workspace/Demo
 
 sed -i "s,JENKINS_URL,${JENKINS_URL},g" ./workspace/Demo/callJenkins.sh
 sed -i "s,JENKINS_USER,${JENKINS_USER},g" ./workspace/Demo/callJenkins.sh
-sed -i "s,JENKINS_PASS,${JENKINS_PASS},g" ./workspace/Demo/.gitlab-ci.yml
+sed -i "s,INSECURE_JENKINS_PASS: JENKINS_PASS,INSECURE_JENKINS_PASS: ${JENKINS_PASS},g" ./workspace/Demo/.gitlab-ci.yml
 
 cd workspace/Demo
 
@@ -113,3 +114,7 @@ docker exec --user root cicd_jenkins sh -c "cd /tmp && curl -L -s -k  http://${J
 docker exec --user root cicd_jenkins sh -c "java -jar /tmp/jenkins-cli.jar -auth ${JENKINS_USER}:${JENKINS_PASS} -s http://${JENKINS_URL} create-job InsecureDemo < /tmp/InsecureJob.xml"
 
 rm -f  ./workspace/InsecureJob.xml
+
+echo "#################################"
+echo "# Insecure Demo Deployed"
+echo "#################################"

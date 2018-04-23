@@ -224,4 +224,7 @@ EOL
 
 rm -f data_key
 
-bin/print_login.sh
+echo "###################################"
+echo "# CI/CD Pipeline systems installed"
+echo "###################################"
+

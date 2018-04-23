@@ -47,7 +47,7 @@
         maven &apos;maven3&apos;
     }
     environment {
-	JAVA_HOME = "/usr/lib/jvm/java-1.8-openjdk"
+	JAVA_HOME = "/usr/lib/jvm/java-1.8.0-openjdk-amd64"
     }	
     stages {
 	stage(&apos;Initialize Process&apos;) {

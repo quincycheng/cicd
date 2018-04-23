@@ -121,6 +121,7 @@ echo "#################################"
 
 cp -r ./gitlab/Demo ./workspace/Demo
 cp ./gitlab/SecureDemo/.gitlab-ci.yml ./workspace/Demo
+cp ./gitlab/SecureDemo/callJenkins.sh ./workspace/Demo
 cp ./gitlab/SecureDemo/secrets.yml ./workspace/Demo
 
 sed -i "s,JENKINS_USER,${JENKINS_USER},g" ./workspace/Demo/callJenkins.sh
@@ -146,11 +147,9 @@ echo "#################################"
 cp -r ./jenkins/SecureDemo/job.xml ./workspace/SecureJob.xml
 
 sed -i "s,GITLAB_USER,${GITLAB_USER},g" ./workspace/SecureJob.xml
-sed -i "s,GITLAB_PASS,${GITLAB_PASS},g" ./workspace/SecureJob.xml
 sed -i "s,GITLAB_URL,${GITLAB_URL},g" ./workspace/SecureJob.xml
 
 sed -i "s,ARTIFACTORY_USER,${ARTIFACTORY_USER},g" ./workspace/SecureJob.xml
-sed -i "s,ARTIFACTORY_PASS,${ARTIFACTORY_PASS},g" ./workspace/SecureJob.xml
 sed -i "s,ARTIFACTORY_URL,${ARTIFACTORY_URL},g" ./workspace/SecureJob.xml
 
 
@@ -159,7 +158,6 @@ AWX_CONTAINER_IP=$(docker inspect awx_web | jq -r '.[].NetworkSettings.Networks.
 
 sed -i "s,AWX_CONTAINER_IP,${AWX_CONTAINER_IP},g" ./workspace/SecureJob.xml
 sed -i "s,AWX_USER,${AWX_USER},g" ./workspace/SecureJob.xml
-sed -i "s,AWX_PASS,${AWX_PASS},g" ./workspace/SecureJob.xml
 sed -i "s,AWX_TEMPLATE_ID,${AWX_TEMPLATE_ID},g" ./workspace/SecureJob.xml
 
 docker cp ./workspace/SecureJob.xml cicd_jenkins:/tmp/SecureJob.xml
@@ -167,3 +165,7 @@ docker exec --user root cicd_jenkins sh -c "cd /tmp && curl -L -s -k  http://${J
 docker exec --user root cicd_jenkins sh -c "java -jar /tmp/jenkins-cli.jar -auth ${JENKINS_USER}:${JENKINS_PASS} -s http://${JENKINS_URL} create-job SecureDemo < /tmp/SecureJob.xml"
 
 rm -f  ./workspace/SecureJob.xml
+
+echo "#################################"
+echo "# Secure Demo Deployed"
+echo "#################################"
