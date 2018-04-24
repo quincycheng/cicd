@@ -1,7 +1,7 @@
 # CICD Demo
 
 ## Purpose
-This repo serves for preparing a CI/CD pipeline environment for testing
+This repo demostrates how to secure CI/CD pipeline using CyberArk Conjur
 
 ## Install
 
