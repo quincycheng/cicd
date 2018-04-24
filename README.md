@@ -5,7 +5,7 @@ This repo demostrates how to secure CI/CD pipeline using CyberArk Conjur
 
 ## Install
 
-type `bin\start.sh`
+run `bin/start.sh`
 
 This script will install docker, docker-compose & ansible on the host, and configure the firewall using ansible iptables module.
 Then create GitLab, GitLab runner, WeaveScope, Jenkins BlueOcean, Ansible, SonarQube, Artifactory & Conjur as containers
