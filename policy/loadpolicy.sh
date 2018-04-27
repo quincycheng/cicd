@@ -28,7 +28,7 @@ conjur variable values add jenkins/password ${JENKINS_PASS}
 conjur variable values add sonar/password ${SONAR_PASS}
 conjur variable values add artifactory/password ${ARTIFACTORY_PASS}
 conjur variable values add awx/password ${AWX_PASS}
-conjur variable values add docker/ssh_private_key  /tmp/policy/ida_rsa
+conjur variable values add docker/ssh_private_key  "$(cat /tmp/policy/ida_rsa)"
 
 cat /tmp/policy/entitlement.yml >> /tmp/policy/conjur.yml
 conjur policy load root /tmp/policy/conjur.yml

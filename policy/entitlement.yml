@@ -20,6 +20,10 @@
   member: !layer /jenkins
 
 - !grant
+  role: !group awx/secrets-users
+  member: !layer /awx
+
+- !grant
   role: !group artifactory/secrets-users
   member: !layer /awx
 

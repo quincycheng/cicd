@@ -23,7 +23,6 @@
         url: "{{artifact_url}}"
         dest: "{{ppath.stdout}}/app.war"
 
-
     - name: Build image
       shell: "docker build -t cicd/insecuredemo:latest . -f {{ppath.stdout}}/Dockerfile"
 

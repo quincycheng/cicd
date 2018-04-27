@@ -42,6 +42,7 @@ echo "#################################"
 install_summon ${CONJUR_ACCOUNT} cicd_gitlab_runner gitlab
 install_summon ${CONJUR_ACCOUNT} cicd_jenkins jenkins
 install_summon ${CONJUR_ACCOUNT} awx_task awx
+#install_summon ${CONJUR_ACCOUNT} awx_web awx
 
 echo "#################################"
 echo "# Create AWX Secure Demo"
@@ -93,13 +94,21 @@ AWX_HOST_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USE
          \"enabled\": true }" | jq -r '.id')
 echo "AWX Host ID: ${AWX_HOST_ID}"
 
+# Create Credential
+AWX_CREDENTIAL_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/credentials/ \
+   -d "{ \"name\": \"docker_ssh_key\", \"description\": \"Docker SSH Key\", \"organization\": ${AWX_ORG_ID}, \
+         \"credential_type\": 1 }"  | jq -r '.id')
+echo "AWX Credential ID: ${AWX_CREDENTIAL_ID}"
+
 # Create Job Template
 AWX_TEMPLATE_ID=$(curl -s -k -H "Content-Type: application/json" -X POST -u $AWX_USER:$AWX_PASS $AWX_URL/api/v2/job_templates/  \
    -d "{ \"name\": \"Secure Demo\", \"description\": \"Secure Demo\", \"inventory\": ${AWX_INVENTORY_ID}, \
+         \"credential\": ${AWX_CREDENTIAL_ID}, \
          \"project\": ${AWX_PROJECT_ID}, \"playbook\": \"deploy.yml\", \"ask_variables_on_launch\": true }" | jq -r '.id')
 
 echo "AWX Template ID: ${AWX_TEMPLATE_ID} "
 
+docker exec awx_task pip install ansible-tower-cli
 
 
 

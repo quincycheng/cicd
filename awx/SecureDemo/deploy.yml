@@ -1,11 +1,14 @@
 ---
+- name: Update credential in AWX
+  hosts: localhost
+  connection: local
+  tasks:
+    - shell: summon ./update_awx_credential.sh
+
 - name: Build & Deploy Artifact to Docker
   hosts: all
   roles:
     - role: '{{playbook_dir}}'
-  vars:
-    ansible_ssh_private_key_file: /tmp/id_rsa
-    ansible_user: cicd_service_account
 
   tasks:
     - name: Find out playbooks path
@@ -22,7 +25,6 @@
       get_url:
         url: "{{artifact_url}}"
         dest: "{{ppath.stdout}}/app.war"
-
 
     - name: Build image
       shell: "docker build -t cicd/securedemo:latest . -f {{ppath.stdout}}/Dockerfile"
