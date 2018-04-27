@@ -81,3 +81,23 @@
       jump: ACCEPT
 
 
+  - name: accept securedemo 8099
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 8099
+      protocol: tcp
+      jump: ACCEPT
+
+
+  - name: accept insecuredemo 8091
+    iptables:
+      chain: IN_public_allow
+      source: 0.0.0.0/0
+      ctstate: NEW,ESTABLISHED
+      destination_port: 8091
+      protocol: tcp
+      jump: ACCEPT
+
+
