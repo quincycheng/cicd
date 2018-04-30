@@ -4,12 +4,15 @@
 This repo demostrates how to secure CI/CD pipeline using CyberArk Conjur
 
 ## Install
-
+Login as root or "sudo su -"
 run `bin/start.sh`
 
 This script will install docker, docker-compose & ansible on the host, and configure the firewall using ansible iptables module.
 Then create GitLab, GitLab runner, WeaveScope, Jenkins BlueOcean, Ansible, SonarQube, Artifactory & Conjur as containers
 It also install 2 demos projects: Insecure demo & Secure Demo
+
+[![Setup Video](https://asciinema.org/a/MIz7enVsVbKRTlEO9ehwjgn7h.png)](https://asciinema.org/a/MIz7enVsVbKRTlEO9ehwjgn7h)
+
 
 ### Host names
 xip.io will be used for DNS names for containers.
@@ -59,4 +62,6 @@ A ruby script is used to get the registration token as there is no offical way t
 ### bin/cleanup.sh
 This script kills & removes all related containers
 
+### bin/print_log.sh
+This script will print out all the links & login details of each CI/CD tools
 
