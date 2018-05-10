@@ -34,4 +34,4 @@
         name: cicd_SecureDemo
         image: cicd/securedemo:latest
         ports:
-          - "8099:8099"
+          - "8099:8091"
